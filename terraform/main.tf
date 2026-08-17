@@ -1,8 +1,20 @@
-resource "aws_s3_bucket" "example" {
-  bucket = "my-tf-test-bucket-17-08-2026"
-
-  tags = {
-    Name        = "My bucket"
-    Environment = "Dev"
+locals {
+  common_tags = {
+    Env     = var.environment
+    Project = var.domain_name
   }
+}
+
+module "vpc" {
+  source           = "./modules/vpc"
+  cidr_block       = var.vpc_cidr
+  instance_tenancy = "default"
+
+  subnets = var.subnets
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "pizzabox_vpc"
+    }
+  )
 }

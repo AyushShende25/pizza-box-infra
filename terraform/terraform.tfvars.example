@@ -1,0 +1,9 @@
+domain_name =
+vpc_cidr =
+subnets = {
+  "key (subnet-name)" = {
+    cidr_block        = "",
+    availability_zone = "",
+    type              = ""
+  }
+}
