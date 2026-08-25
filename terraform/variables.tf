@@ -26,3 +26,12 @@ variable "subnets" {
   }))
   description = "Map of subnets to create, key = subnet name"
 }
+
+
+variable "eks_cluster_name" {
+  type = string
+}
+
+variable "admin_principal_arn" {
+  type = string
+}

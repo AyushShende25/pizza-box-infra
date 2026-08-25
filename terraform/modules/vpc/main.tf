@@ -15,6 +15,11 @@ resource "aws_subnet" "subnet" {
     var.tags,
     {
       Name = each.key
+
+      # Tag for Public Load Balancers
+      "kubernetes.io/role/elb" = each.value.type == "public" ? "1" : null
+
+      "kubernetes.io/cluster/${var.eks_cluster_name}" = "owned"
     }
   )
 }
