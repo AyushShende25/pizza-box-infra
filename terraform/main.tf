@@ -52,3 +52,32 @@ module "app_ecr" {
 
   tags = local.common_tags
 }
+
+module "security_groups" {
+  source   = "./modules/security-groups"
+  vpc_id   = module.vpc.vpc_id
+  api_port = 8000
+
+  tags = local.common_tags
+}
+
+module "rds" {
+  source                  = "./modules/rds"
+  db_identifier           = var.db_identifier
+  engine_version          = var.psql_version
+  db_subnet_group_name    = var.db_subnet_group_name
+  subnet_ids              = values(module.vpc.db_subnet_ids)
+  db_name                 = var.db_name
+  allocated_storage       = var.db_allocated_storage
+  instance_class          = var.db_instance_class
+  username                = var.db_username
+  password                = var.db_password
+  backup_retention_period = 1
+  skip_final_snapshot     = true
+  vpc_security_group_ids  = [module.security_groups.database_security_group_id]
+  tags = merge(local.common_tags,
+    {
+      Name = "pizzabox-database"
+    }
+  )
+}

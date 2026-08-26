@@ -27,7 +27,7 @@ variable "subnets" {
   description = "Map of subnets to create, key = subnet name"
 }
 
-
+# EKS
 variable "eks_cluster_name" {
   type = string
 }
@@ -36,6 +36,7 @@ variable "admin_principal_arn" {
   type = string
 }
 
+# ECR
 
 variable "ecr_repository_name" {
   type        = string
@@ -46,4 +47,37 @@ variable "image_tag_mutability" {
   type        = string
   description = "The tag mutability setting for the repository. Must be MUTABLE or IMMUTABLE"
   default     = "IMMUTABLE"
+}
+
+# DATABASE - RDS
+
+variable "db_subnet_group_name" {
+  type = string
+}
+
+variable "db_name" {
+  type = string
+}
+
+variable "db_username" {
+  type = string
+}
+
+variable "db_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "db_identifier" {
+  type = string
+}
+variable "psql_version" {
+  type = string
+}
+variable "db_instance_class" {
+  type = string
+}
+
+variable "db_allocated_storage" {
+  type = number
 }
