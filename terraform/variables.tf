@@ -35,3 +35,15 @@ variable "eks_cluster_name" {
 variable "admin_principal_arn" {
   type = string
 }
+
+
+variable "ecr_repository_name" {
+  type        = string
+  description = "Name of the ECR repository"
+}
+
+variable "image_tag_mutability" {
+  type        = string
+  description = "The tag mutability setting for the repository. Must be MUTABLE or IMMUTABLE"
+  default     = "IMMUTABLE"
+}

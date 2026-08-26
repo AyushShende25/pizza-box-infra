@@ -42,3 +42,13 @@ module "eks" {
 
   tags = local.common_tags
 }
+module "app_ecr" {
+  source = "./modules/ecr"
+
+  name                 = var.ecr_repository_name
+  image_tag_mutability = var.image_tag_mutability
+  scan_on_push         = true
+  force_delete         = true
+
+  tags = local.common_tags
+}
