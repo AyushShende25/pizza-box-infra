@@ -81,3 +81,21 @@ module "rds" {
     }
   )
 }
+
+module "redis" {
+  source                  = "./modules/elasticache"
+  replication_group_id    = var.redis_replication_group_name
+  node_type               = var.redis_node_type
+  redis_subnet_group_name = var.redis_subnet_group_name
+  security_group_ids      = [module.security_groups.redis_security_group_id]
+  subnet_ids              = values(module.vpc.db_subnet_ids)
+  engine_version          = var.redis_engine_version
+  password                = var.redis_password
+  num_cache_clusters      = var.num_cache_clusters
+  tags = merge(local.common_tags,
+    {
+      Name = "pizzabox-redis"
+
+    }
+  )
+}
