@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pizzabox-worker
+  namespace: pizzabox-app-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pizzabox-worker
+  template:
+    metadata:
+      labels:
+        app: pizzabox-worker
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: pizzabox-worker
+          image: pizzabox
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              '/app/.venv/bin/celery',
+              '-A',
+              'app.core.celery_app.celery_app',
+              'worker',
+              '--loglevel=INFO',
+            ]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
+          envFrom:
+            - secretRef:
+                name: pizzabox-secret
