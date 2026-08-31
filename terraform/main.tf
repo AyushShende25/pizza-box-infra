@@ -42,6 +42,18 @@ module "eks" {
 
   tags = local.common_tags
 }
+
+module "eks_addons" {
+  source = "./modules/eks-addons"
+
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_provider_url = module.eks.oidc_provider_url
+  r53_hosted_zone   = var.r53_hosted_zone
+  secret_arn        = module.secrets_manager.secret_arn
+
+  tags = local.common_tags
+}
+
 module "app_ecr" {
   source = "./modules/ecr"
 
@@ -98,4 +110,38 @@ module "redis" {
 
     }
   )
+}
+
+module "secrets_manager" {
+  source = "./modules/secrets-manager"
+
+  secret_name = "pizzabox/production/api"
+
+  database_endpoint = module.rds.endpoint
+  database_name     = module.rds.db_name
+  database_password = var.db_password
+  database_user     = var.db_username
+
+  redis_endpoint = module.redis.primary_endpoint
+  redis_password = var.redis_password
+
+  env_var_jwt_secret_key = var.env_var_jwt_secret_key
+  env_var_mail_username  = var.env_var_mail_username
+  env_var_mail_password  = var.env_var_mail_password
+  env_var_rzp_key_id     = var.env_var_rzp_key_id
+  env_var_rzp_key_secret = var.env_var_rzp_key_secret
+
+  tags = local.common_tags
+}
+
+
+module "helm" {
+  source = "./modules/helm"
+
+  cluster_name           = module.eks.cluster_name
+  r53_hosted_zone        = var.r53_hosted_zone
+  external_dns_role_arn  = module.eks_addons.external_dns_role_arn
+  eso_role_arn           = module.eks_addons.eso_role_arn
+  lb_controller_role_arn = module.eks_addons.lb_controller_role_arn
+  vpc_id                 = module.vpc.vpc_id
 }

@@ -113,3 +113,26 @@ variable "redis_password" {
   description = "Password (AUTH token) for Redis client authentication"
   sensitive   = true
 }
+
+# SECRETS_MANAGER
+variable "env_var_jwt_secret_key" {
+  type = string
+}
+variable "env_var_mail_username" {
+  type = string
+}
+variable "env_var_mail_password" {
+  type = string
+}
+variable "env_var_rzp_key_id" {
+  type = string
+}
+variable "env_var_rzp_key_secret" {
+  type = string
+}
+
+
+# DNS
+variable "r53_hosted_zone" {
+  type = string
+}

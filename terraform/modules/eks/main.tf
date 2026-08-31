@@ -69,7 +69,7 @@ resource "aws_eks_access_policy_association" "admin" {
 }
 
 
-# ADD-ONS
+# Managed ADD-ONS
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.eks.name
   addon_name   = "vpc-cni"
