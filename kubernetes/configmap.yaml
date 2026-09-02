@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pizzabox-config
+  namespace: pizzabox-app-ns
+data:
+  APP_ENV: production
+  LOG_LEVEL: WARNING
+  BASE_URL: https://api.pizzabox.fullstackprojects.dev
+  CLIENT_URL: https://pizzabox.fullstackprojects.dev
+  ADMIN_URL: https://admin.pizzabox.fullstackprojects.dev
+
+  JWT_ALGORITHM: HS256
+  ACCESS_TOKEN_EXPIRE_MINUTES: '60'
+  REFRESH_TOKEN_EXPIRE_HOURS: '24'
+
+  MAIL_TOKEN_EXPIRE_SECONDS: '900'
+  MAIL_FROM: pizzabox@fullstackprojects.dev
+  MAIL_FROM_NAME: PizzaBox
+  MAIL_PORT: '587'
+  MAIL_SERVER: live.smtp.mailtrap.io
+
+  BUCKET_CUSTOM_DOMAIN: https://your-bucket-cdn-or-url
+  BUCKET_NAME: media.pizzabox.fullstackprojects.dev
+  BUCKET_REGION_NAME: ap-south-1

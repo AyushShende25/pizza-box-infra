@@ -44,3 +44,4 @@ terraform.rc
 # planout
 
 commands.md
+.DS_Store

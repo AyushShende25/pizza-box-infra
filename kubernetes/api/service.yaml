@@ -4,12 +4,12 @@ metadata:
   name: pizzabox-api-svc
   namespace: pizzabox-app-ns
 spec:
-  type: NodePort
-  # type: ClusterIP
+  # type: NodePort
+  type: ClusterIP
   selector:
     app: pizzabox-api
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
-      nodePort: 31000
+      # nodePort: 31000

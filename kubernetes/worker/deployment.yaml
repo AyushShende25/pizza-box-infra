@@ -13,26 +13,67 @@ spec:
       labels:
         app: pizzabox-worker
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: 'ScheduleAnyway'
+          labelSelector:
+            matchLabels:
+              app: pizzabox-worker
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: 'ScheduleAnyway'
+          labelSelector:
+            matchLabels:
+              app: pizzabox-worker
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
       restartPolicy: Always
       containers:
         - name: pizzabox-worker
-          image: pizzabox
+          image: 651447471372.dkr.ecr.ap-south-1.amazonaws.com/pizzabox-backend
           imagePullPolicy: IfNotPresent
           command:
-            [
-              '/app/.venv/bin/celery',
-              '-A',
-              'app.core.celery_app.celery_app',
-              'worker',
-              '--loglevel=INFO',
-            ]
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 200m
-              memory: 512Mi
+            - /app/.venv/bin/celery
+            - -A
+            - app.core.celery_app.celery_app
+            - worker
+            - --loglevel=INFO
+            - --concurrency=2
+            - --max-tasks-per-child=100
           envFrom:
+            - configMapRef:
+                name: pizzabox-config
             - secretRef:
                 name: pizzabox-secret
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /app/.venv/bin/celery -A app.core.celery_app.celery_app inspect ping -d celery@${HOSTNAME}
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 15
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
