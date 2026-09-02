@@ -10,7 +10,8 @@ variable "environment" {
 }
 
 variable "domain_name" {
-  type = string
+  type    = string
+  default = "pizzabox.fullstackprojects.dev"
 }
 
 variable "vpc_cidr" {
@@ -134,5 +135,6 @@ variable "env_var_rzp_key_secret" {
 
 # DNS
 variable "r53_hosted_zone" {
-  type = string
+  type    = string
+  default = "fullstackprojects.dev"
 }

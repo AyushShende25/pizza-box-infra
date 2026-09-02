@@ -6,7 +6,7 @@ variable "oidc_provider_url" {
   type = string
 }
 
-variable "r53_hosted_zone" {
+variable "r53_hosted_zone_id" {
   type = string
 }
 

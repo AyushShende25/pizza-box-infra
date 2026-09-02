@@ -133,7 +133,7 @@ data "aws_iam_policy_document" "external_dns_policy" {
     ]
 
     resources = [
-      "arn:aws:route53:::hostedzone/${var.r53_hosted_zone}"
+      "arn:aws:route53:::hostedzone/${var.r53_hosted_zone_id}"
     ]
   }
 
@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "external_dns_policy" {
     ]
 
     resources = [
-      "arn:aws:route53:::hostedzone/${var.r53_hosted_zone}"
+      "arn:aws:route53:::hostedzone/${var.r53_hosted_zone_id}"
     ]
   }
 

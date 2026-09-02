@@ -42,14 +42,17 @@ module "eks" {
 
   tags = local.common_tags
 }
+data "aws_route53_zone" "main" {
+  name         = var.r53_hosted_zone
+  private_zone = false
+}
+module "irsa" {
+  source = "./modules/irsa"
 
-module "eks_addons" {
-  source = "./modules/eks-addons"
-
-  oidc_provider_arn = module.eks.oidc_provider_arn
-  oidc_provider_url = module.eks.oidc_provider_url
-  r53_hosted_zone   = var.r53_hosted_zone
-  secret_arn        = module.secrets_manager.secret_arn
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_provider_url  = module.eks.oidc_provider_url
+  r53_hosted_zone_id = data.aws_route53_zone.main.zone_id
+  secret_arn         = module.secrets_manager.secret_arn
 
   tags = local.common_tags
 }
@@ -140,8 +143,18 @@ module "helm" {
 
   cluster_name           = module.eks.cluster_name
   r53_hosted_zone        = var.r53_hosted_zone
-  external_dns_role_arn  = module.eks_addons.external_dns_role_arn
-  eso_role_arn           = module.eks_addons.eso_role_arn
-  lb_controller_role_arn = module.eks_addons.lb_controller_role_arn
+  external_dns_role_arn  = module.irsa.external_dns_role_arn
+  eso_role_arn           = module.irsa.eso_role_arn
+  lb_controller_role_arn = module.irsa.lb_controller_role_arn
   vpc_id                 = module.vpc.vpc_id
+}
+
+module "acm" {
+  source         = "./modules/acm"
+  domain_name    = "*.${var.domain_name}"
+  hosted_zone_id = data.aws_route53_zone.main.zone_id
+
+  tags = merge(local.common_tags, {
+    Purpose = "EKS Regional ALB"
+  })
 }

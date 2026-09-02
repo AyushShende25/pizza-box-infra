@@ -9,9 +9,9 @@ resource "aws_secretsmanager_secret_version" "sm_version" {
   secret_string = jsonencode({
 
     DATABASE_URL          = "postgresql+asyncpg://${var.database_user}:${var.database_password}@${var.database_endpoint}/${var.database_name}"
-    REDIS_URL             = "rediss://:${var.redis_password}@${var.redis_endpoint}:6379/0"
-    CELERY_BROKER_URL     = "rediss://:${var.redis_password}@${var.redis_endpoint}:6379/1"
-    CELERY_RESULT_BACKEND = "rediss://:${var.redis_password}@${var.redis_endpoint}:6379/2"
+    REDIS_URL             = "redis://:${var.redis_password}@${var.redis_endpoint}:6379/0"
+    CELERY_BROKER_URL     = "redis://:${var.redis_password}@${var.redis_endpoint}:6379/1"
+    CELERY_RESULT_BACKEND = "redis://:${var.redis_password}@${var.redis_endpoint}:6379/2"
 
     JWT_SECRET_KEY      = var.env_var_jwt_secret_key
     MAIL_USERNAME       = var.env_var_mail_username
