@@ -1,0 +1,6 @@
+apiVersion: v2
+name: pizzabox
+description: Pizzabox FastAPI backend and Celery worker service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
