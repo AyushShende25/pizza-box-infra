@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pizzabox
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: pizzabox-project
+  source:
+    repoURL: https://github.com/AyushShende25/pizza-box-infra
+    targetRevision: main
+    path: helm/pizzabox
+    helm:
+      releaseName: pizzabox
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: pizzabox-app-ns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true

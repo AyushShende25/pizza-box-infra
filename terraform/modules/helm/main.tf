@@ -115,3 +115,13 @@ resource "helm_release" "dns" {
     helm_release.alb
   ]
 }
+
+
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  version          = "10.8.1"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+}
