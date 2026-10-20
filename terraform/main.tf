@@ -38,9 +38,8 @@ module "eks" {
   desired_size          = 2
   max_size              = 4
   min_size              = 1
-  worker_instance_types = ["t3.small"]
-
-  tags = local.common_tags
+  worker_instance_types = ["t3.medium"]
+  tags                  = local.common_tags
 }
 data "aws_route53_zone" "main" {
   name         = var.r53_hosted_zone
@@ -49,12 +48,12 @@ data "aws_route53_zone" "main" {
 module "irsa" {
   source = "./modules/irsa"
 
-  oidc_provider_arn  = module.eks.oidc_provider_arn
-  oidc_provider_url  = module.eks.oidc_provider_url
-  r53_hosted_zone_id = data.aws_route53_zone.main.zone_id
-  secret_arn         = module.secrets_manager.secret_arn
-
-  tags = local.common_tags
+  oidc_provider_arn   = module.eks.oidc_provider_arn
+  oidc_provider_url   = module.eks.oidc_provider_url
+  r53_hosted_zone_id  = data.aws_route53_zone.main.zone_id
+  secret_arn          = module.secrets_manager.secret_arn
+  s3_media_bucket_arn = module.s3_media.bucket_arn
+  tags                = local.common_tags
 }
 
 module "app_ecr" {
@@ -147,6 +146,10 @@ module "helm" {
   eso_role_arn           = module.irsa.eso_role_arn
   lb_controller_role_arn = module.irsa.lb_controller_role_arn
   vpc_id                 = module.vpc.vpc_id
+
+  depends_on = [
+    module.eks
+  ]
 }
 
 module "acm" {
@@ -157,4 +160,131 @@ module "acm" {
   tags = merge(local.common_tags, {
     Purpose = "EKS Regional ALB"
   })
+}
+
+module "s3_media" {
+  source = "./modules/s3"
+
+  bucket_name = "${var.domain_name}-media-uploads"
+  client_url  = "https://${var.domain_name}"
+  enable_cors = true
+
+  tags = merge(local.common_tags,
+    {
+      Type = "media-uploads"
+    }
+  )
+}
+
+module "s3_react_client" {
+  source = "./modules/s3"
+
+  bucket_name = "${var.domain_name}-client"
+  enable_cors = false
+
+  tags = merge(local.common_tags,
+    {
+      Type = "frontend-client-static"
+    }
+  )
+}
+module "s3_react_admin" {
+  source = "./modules/s3"
+
+  bucket_name = "${var.domain_name}-admin"
+  enable_cors = false
+
+  tags = merge(local.common_tags,
+    {
+      Type = "frontend-admin-static"
+    }
+  )
+}
+
+
+module "cloudfront_react_client" {
+  source = "./modules/cloudfront"
+
+  name                           = "pizzabox-client-cdn"
+  s3_bucket_id                   = module.s3_react_client.bucket_id
+  s3_bucket_arn                  = module.s3_react_client.bucket_arn
+  s3_bucket_regional_domain_name = module.s3_react_client.bucket_regional_domain_name
+  domain_aliases                 = [var.domain_name]
+  acm_certificate_arn            = module.acm_cloudfront.arn
+  is_spa                         = true
+
+  tags = local.common_tags
+}
+module "cloudfront_react_admin" {
+  source = "./modules/cloudfront"
+
+  name                           = "pizzabox-admin-cdn"
+  s3_bucket_id                   = module.s3_react_admin.bucket_id
+  s3_bucket_arn                  = module.s3_react_admin.bucket_arn
+  s3_bucket_regional_domain_name = module.s3_react_admin.bucket_regional_domain_name
+  domain_aliases                 = ["admin.${var.domain_name}"]
+  acm_certificate_arn            = module.acm_cloudfront.arn
+  is_spa                         = true
+
+  tags = local.common_tags
+}
+
+module "cloudfront_media" {
+  source = "./modules/cloudfront"
+
+  name                           = "pizzabox-media-cdn"
+  s3_bucket_id                   = module.s3_media.bucket_id
+  s3_bucket_arn                  = module.s3_media.bucket_arn
+  s3_bucket_regional_domain_name = module.s3_media.bucket_regional_domain_name
+  domain_aliases                 = ["media.${var.domain_name}"]
+  acm_certificate_arn            = module.acm_cloudfront.arn
+  is_spa                         = false
+
+  tags = local.common_tags
+}
+
+
+module "acm_cloudfront" {
+  source = "./modules/acm"
+
+  providers = {
+    aws = aws.us_east_1
+  }
+
+  domain_name               = "*.${var.domain_name}"
+  hosted_zone_id            = data.aws_route53_zone.main.zone_id
+  subject_alternative_names = [var.domain_name]
+
+  tags = merge(local.common_tags, {
+    Purpose = "PizzaBox CloudFront"
+  })
+}
+
+
+module "dns_react_client" {
+  source = "./modules/route53"
+
+  hosted_zone_id  = data.aws_route53_zone.main.zone_id
+  domain_name     = var.domain_name
+  target_dns_name = module.cloudfront_react_client.domain_name
+  target_zone_id  = module.cloudfront_react_client.hosted_zone_id
+}
+
+module "dns_react_admin" {
+  source = "./modules/route53"
+
+  hosted_zone_id  = data.aws_route53_zone.main.zone_id
+  domain_name     = "admin.${var.domain_name}"
+  target_dns_name = module.cloudfront_react_admin.domain_name
+  target_zone_id  = module.cloudfront_react_admin.hosted_zone_id
+}
+
+
+module "dns_media" {
+  source = "./modules/route53"
+
+  hosted_zone_id  = data.aws_route53_zone.main.zone_id
+  domain_name     = "media.${var.domain_name}"
+  target_dns_name = module.cloudfront_media.domain_name
+  target_zone_id  = module.cloudfront_media.hosted_zone_id
 }

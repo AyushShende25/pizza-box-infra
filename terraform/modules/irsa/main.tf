@@ -173,3 +173,62 @@ resource "aws_iam_role_policy_attachment" "external_dns_policy" {
   role       = aws_iam_role.external_dns_role.name
   policy_arn = aws_iam_policy.external_dns_policy.arn
 }
+
+data "aws_iam_policy_document" "pizzabox_uploader_assume_role" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    principals {
+      type        = "Federated"
+      identifiers = [var.oidc_provider_arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${var.oidc_provider_url}:sub"
+      values   = ["system:serviceaccount:pizzabox-app-ns:s3-uploader-serviceaccount"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${var.oidc_provider_url}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "pizzabox_uploader_role" {
+  name               = "pizzabox-uploader-role"
+  assume_role_policy = data.aws_iam_policy_document.pizzabox_uploader_assume_role.json
+  tags               = var.tags
+}
+
+data "aws_iam_policy_document" "s3_media_policy" {
+  statement {
+    sid    = "ManageMediaObjects"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+    resources = ["${var.s3_media_bucket_arn}/*"]
+  }
+
+  statement {
+    sid       = "ReadMediaBucketMetadata"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket", "s3:GetBucketLocation"]
+    resources = [var.s3_media_bucket_arn]
+  }
+}
+resource "aws_iam_policy" "s3_media_policy" {
+  name        = "pizzabox-uploader-s3-media-policy"
+  description = "Allows the PizzaBox API to access media objects"
+  policy      = data.aws_iam_policy_document.s3_media_policy.json
+}
+resource "aws_iam_role_policy_attachment" "s3_media_policy" {
+  role       = aws_iam_role.pizzabox_uploader_role.name
+  policy_arn = aws_iam_policy.s3_media_policy.arn
+}
