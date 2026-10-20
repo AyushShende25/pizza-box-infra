@@ -30,6 +30,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 10001
         runAsGroup: 10001
+      serviceAccountName: s3-uploader-serviceaccount
       restartPolicy: Always
       containers:
         - name: pizzabox-api

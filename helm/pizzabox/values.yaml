@@ -134,6 +134,12 @@ configMap:
     MAIL_PORT: "587"
     MAIL_SERVER: "live.smtp.mailtrap.io"
 
-    BUCKET_CUSTOM_DOMAIN: "https://your-bucket-cdn-or-url"
-    BUCKET_NAME: "media.pizzabox.fullstackprojects.dev"
+    BUCKET_CUSTOM_DOMAIN: "https://media.pizzabox.fullstackprojects.dev"
+    BUCKET_NAME: "pizzabox.fullstackprojects.dev-media-uploads"
     BUCKET_REGION_NAME: "ap-south-1"
+
+serviceAccount:
+  create: true
+  name: s3-uploader-serviceaccount
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::651447471372:role/pizzabox-uploader-role
