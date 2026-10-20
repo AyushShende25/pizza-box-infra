@@ -5,7 +5,7 @@ variable "domain_name" {
 
 variable "subject_alternative_names" {
   type        = list(string)
-  description = "Additional domains/subdomains (e.g. ['api.inkspire.fullstackprojects.dev'])"
+  description = "Additional domains/subdomains (e.g. ['api.pizzabox.fullstackprojects.dev'])"
   default     = []
 }
 
