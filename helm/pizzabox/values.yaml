@@ -143,3 +143,8 @@ serviceAccount:
   name: s3-uploader-serviceaccount
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::651447471372:role/pizzabox-uploader-role
+
+migration:
+  enabled: true
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 360
