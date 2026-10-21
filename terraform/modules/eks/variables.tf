@@ -38,6 +38,11 @@ variable "worker_instance_types" {
   type = list(string)
 }
 
+variable "node_security_group_id" {
+  description = "Custom security group attached to EKS worker nodes"
+  type        = string
+}
+
 variable "admin_principal_arn" {
   type = string
 }

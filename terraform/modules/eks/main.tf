@@ -17,6 +17,31 @@ resource "aws_eks_cluster" "eks" {
   tags = var.tags
 }
 
+# Launch Template
+
+resource "aws_launch_template" "custom_nodes" {
+  name_prefix = "${var.cluster_name}-nodes-"
+
+  vpc_security_group_ids = [
+    var.node_security_group_id,
+    aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+  ]
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "enabled"
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags
+  }
+
+  tags = var.tags
+}
+
 
 # WORKER-NODES
 resource "aws_eks_node_group" "eks_ng" {
@@ -25,6 +50,11 @@ resource "aws_eks_node_group" "eks_ng" {
   node_role_arn   = var.node_role_arn
   subnet_ids      = var.subnet_ids
   instance_types  = var.worker_instance_types
+
+  launch_template {
+    id      = aws_launch_template.custom_nodes.id
+    version = tostring(aws_launch_template.custom_nodes.latest_version)
+  }
   scaling_config {
     desired_size = var.desired_size
     max_size     = var.max_size
