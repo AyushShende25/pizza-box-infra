@@ -26,6 +26,8 @@ spec:
       kind: Secret
     - group: ''
       kind: ServiceAccount
+    - group: batch
+      kind: Job
     - group: networking.k8s.io
       kind: Ingress
     - group: external-secrets.io
