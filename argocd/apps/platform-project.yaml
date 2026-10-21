@@ -12,6 +12,11 @@ spec:
   destinations:
     - namespace: external-secrets
       server: https://kubernetes.default.svc
+    - namespace: pizzabox-app-ns
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: external-secrets.io
       kind: ClusterSecretStore
+  namespaceResourceWhitelist:
+    - group: external-secrets.io
+      kind: ExternalSecret

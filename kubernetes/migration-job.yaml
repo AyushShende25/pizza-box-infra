@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrate
+  annotations:
+      argocd.argoproj.io/hook: PreSync
+      argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+      argocd.argoproj.io/sync-wave: '-1'
+spec:
+  ttlSecondsAfterFinished: 360
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: pizzabox-db-migration
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-migration
+          image: 651447471372.dkr.ecr.ap-south-1.amazonaws.com/pizzabox-backend
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: pizzabox-config
+            - secretRef:
+                name: pizzabox-secret
+          command:
+            - uv
+            - run
+            - alembic
+            - upgrade
+            - head
+  
