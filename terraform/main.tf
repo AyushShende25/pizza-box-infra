@@ -290,3 +290,46 @@ module "dns_media" {
   target_dns_name = module.cloudfront_media.domain_name
   target_zone_id  = module.cloudfront_media.hosted_zone_id
 }
+
+module "github_actions_oidc" {
+  source = "./modules/github-actions-oidc"
+}
+
+module "github_api_ci" {
+  source = "./modules/github-actions-role"
+
+  role_name         = "github-actions-api-ci"
+  oidc_provider_arn = module.github_actions_oidc.arn
+  github_repository = var.github_api_repo
+  allowed_branch    = "main"
+
+  policy_arns = [
+    aws_iam_policy.api_ecr_push.arn
+  ]
+}
+
+module "github_client_ci" {
+  source = "./modules/github-actions-role"
+
+  role_name         = "github-actions-client-ci"
+  oidc_provider_arn = module.github_actions_oidc.arn
+  github_repository = var.github_client_repo
+  allowed_branch    = "main"
+
+  policy_arns = [
+    aws_iam_policy.client_s3_deploy.arn
+  ]
+}
+
+module "github_admin_ci" {
+  source = "./modules/github-actions-role"
+
+  role_name         = "github-actions-admin-ci"
+  oidc_provider_arn = module.github_actions_oidc.arn
+  github_repository = var.github_admin_repo
+  allowed_branch    = "main"
+
+  policy_arns = [
+    aws_iam_policy.admin_s3_deploy.arn
+  ]
+}

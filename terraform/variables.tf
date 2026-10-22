@@ -138,3 +138,32 @@ variable "r53_hosted_zone" {
   type    = string
   default = "fullstackprojects.dev"
 }
+
+variable "github_api_repo" {
+  type    = string
+  default = "AyushShende25/pizza-box"
+}
+variable "github_client_repo" {
+  type    = string
+  default = "AyushShende25/pizza-box-client"
+}
+
+variable "github_admin_repo" {
+  type    = string
+  default = "AyushShende25/pizza-box-admin"
+}
+
+
+variable "ecr_arn" {
+  type        = string
+  description = "ARN of the api artifact repo to allow github to push images"
+}
+
+variable "client_bucket_arn" {
+  type        = string
+  description = "ARN of the client S3 bucket."
+}
+variable "admin_bucket_arn" {
+  type        = string
+  description = "ARN of the admin S3 bucket."
+}
