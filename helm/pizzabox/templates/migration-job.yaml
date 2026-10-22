@@ -22,5 +22,5 @@ spec:
                 name: pizzabox-config
             - secretRef:
                 name: pizzabox-secret
-          command: ["uv", "run", "alembic", "upgrade", "head"]
+          command: ["/app/.venv/bin/alembic", "upgrade", "head"]
 {{- end }}

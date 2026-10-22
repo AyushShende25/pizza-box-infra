@@ -17,6 +17,10 @@ spec:
   clusterResourceWhitelist:
     - group: external-secrets.io
       kind: ClusterSecretStore
+    - group: ''
+      kind: Namespace
   namespaceResourceWhitelist:
     - group: external-secrets.io
       kind: ExternalSecret
+    - group: ''
+      kind: ConfigMap
