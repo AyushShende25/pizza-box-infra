@@ -1,23 +1,19 @@
 image:
   repository: 651447471372.dkr.ecr.ap-south-1.amazonaws.com/pizzabox-backend
   pullPolicy: Always
-  tag: 'latest'
-
+  tag: "20afde8"
 configMapName: pizzabox-config
 secretName: pizzabox-secret
-
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 10001
   runAsGroup: 10001
-
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   capabilities:
     drop:
       - ALL
-
 api:
   enabled: true
   replicaCount: 2
@@ -55,7 +51,6 @@ api:
     type: ClusterIP
     port: 80
     targetPort: 8000
-
 worker:
   enabled: true
   replicaCount: 2
@@ -85,8 +80,6 @@ worker:
       periodSeconds: 60
       timeoutSeconds: 15
       failureThreshold: 3
-
-
 ingress:
   enabled: true
   className: alb
@@ -108,23 +101,19 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-
 serviceAccount:
   create: true
   name: s3-uploader-serviceaccount
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::651447471372:role/pizzabox-uploader-role
-
 migration:
   enabled: true
   backoffLimit: 1
   ttlSecondsAfterFinished: 360
-
 apiHpa:
   minReplicas: 2
   maxReplicas: 6
   averageUtilization: 70
-  
 # externalSecret:
 #   enabled: true
 #   refreshInterval: 1h
@@ -156,4 +145,3 @@ apiHpa:
 #     BUCKET_CUSTOM_DOMAIN: "https://media.pizzabox.fullstackprojects.dev"
 #     BUCKET_NAME: "pizzabox.fullstackprojects.dev-media-uploads"
 #     BUCKET_REGION_NAME: "ap-south-1"
-
