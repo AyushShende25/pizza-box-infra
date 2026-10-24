@@ -171,8 +171,12 @@ module "s3_media" {
   source = "./modules/s3"
 
   bucket_name = "${var.domain_name}-media-uploads"
-  client_url  = "https://${var.domain_name}"
   enable_cors = true
+
+  cors_allowed_origins = [
+    "https://admin.${var.domain_name}",
+    "https://${var.domain_name}"
+  ]
 
   tags = merge(local.common_tags,
     {

@@ -3,12 +3,12 @@ variable "bucket_name" {
   description = "Unique S3 bucket name"
 }
 
-variable "client_url" {
-  type        = string
-  description = "Frontend origin allowed to make CORS requests (e.g. https://pizzabox.fullstackprojects.dev)"
-  default     = "*"
-}
 
+variable "cors_allowed_origins" {
+  type        = list(string)
+  description = "List of Frontend origins allowed to make CORS requests (e.g. https://pizzabox.fullstackprojects.dev)"
+  default     = []
+}
 variable "enable_cors" {
   type        = bool
   description = "Enable CORS rules on this bucket (Required for uploads/media bucket)"
