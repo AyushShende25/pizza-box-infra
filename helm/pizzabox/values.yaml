@@ -1,5 +1,3 @@
-
-
 image:
   repository: 651447471372.dkr.ecr.ap-south-1.amazonaws.com/pizzabox-backend
   pullPolicy: Always
@@ -34,20 +32,25 @@ api:
   probes:
     startup:
       httpGet:
-        path: /health
-        port: 8000
-      failureThreshold: 30
-      periodSeconds: 10
-    readiness:
-      httpGet:
-        path: /health
-        port: 8000
-      periodSeconds: 10
-    liveness:
-      httpGet:
-        path: /health
+        path: /health/live
         port: 8000
       periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 30
+    readiness:
+      httpGet:
+        path: /health/ready
+        port: 8000
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
+    liveness:
+      httpGet:
+        path: /health/live
+        port: 8000
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
   service:
     type: ClusterIP
     port: 80
@@ -106,6 +109,22 @@ ingress:
         - path: /
           pathType: Prefix
 
+serviceAccount:
+  create: true
+  name: s3-uploader-serviceaccount
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::651447471372:role/pizzabox-uploader-role
+
+migration:
+  enabled: true
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 360
+
+apiHpa:
+  minReplicas: 2
+  maxReplicas: 6
+  averageUtilization: 70
+  
 # externalSecret:
 #   enabled: true
 #   refreshInterval: 1h
@@ -138,13 +157,3 @@ ingress:
 #     BUCKET_NAME: "pizzabox.fullstackprojects.dev-media-uploads"
 #     BUCKET_REGION_NAME: "ap-south-1"
 
-serviceAccount:
-  create: true
-  name: s3-uploader-serviceaccount
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::651447471372:role/pizzabox-uploader-role
-
-migration:
-  enabled: true
-  backoffLimit: 1
-  ttlSecondsAfterFinished: 360

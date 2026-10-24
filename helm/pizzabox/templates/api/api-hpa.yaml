@@ -1,0 +1,21 @@
+{{- if .Values.api.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "pizzabox.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "pizzabox.fullname" . }}-api
+  minReplicas: {{ .Values.apiHpa.minReplicas }}
+  maxReplicas: {{ .Values.apiHpa.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.apiHpa.averageUtilization }}
+{{- end }}

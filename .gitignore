@@ -45,3 +45,4 @@ terraform.rc
 
 commands.md
 .DS_Store
+.env

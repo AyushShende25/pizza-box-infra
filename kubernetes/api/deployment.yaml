@@ -52,20 +52,25 @@ spec:
               memory: 512Mi
           startupProbe:
             httpGet:
-              path: /health
+              path: /health/live
               port: 8000
-            failureThreshold: 30
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
           readinessProbe:
             httpGet:
-              path: /health
-              port: 8000
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /health
+              path: /health/ready
               port: 8000
             periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
