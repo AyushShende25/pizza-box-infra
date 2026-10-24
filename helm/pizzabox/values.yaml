@@ -1,7 +1,7 @@
 image:
   repository: 651447471372.dkr.ecr.ap-south-1.amazonaws.com/pizzabox-backend
   pullPolicy: Always
-  tag: "20afde8"
+  tag: "a4753fd"
 configMapName: pizzabox-config
 secretName: pizzabox-secret
 podSecurityContext:
@@ -122,7 +122,6 @@ apiHpa:
 #     name: aws-secretsmanager
 #     kind: ClusterSecretStore
 #   remoteKey: pizzabox/production/api
-
 # configMap:
 #   enabled: true
 #   data:
