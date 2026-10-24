@@ -17,7 +17,6 @@ variable "allowed_branch" {
 }
 
 variable "policy_arns" {
-  description = "IAM managed policy ARNs to attach to this role"
-  type        = list(string)
-  default     = []
+  description = "IAM policies to attach to the GitHub Actions role."
+  type        = map(string)
 }
