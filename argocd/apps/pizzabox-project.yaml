@@ -32,3 +32,5 @@ spec:
       kind: Ingress
     - group: external-secrets.io
       kind: ExternalSecret
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
