@@ -130,11 +130,13 @@ module "secrets_manager" {
   redis_endpoint = module.redis.primary_endpoint
   redis_password = var.redis_password
 
-  env_var_jwt_secret_key = var.env_var_jwt_secret_key
-  env_var_mail_username  = var.env_var_mail_username
-  env_var_mail_password  = var.env_var_mail_password
-  env_var_rzp_key_id     = var.env_var_rzp_key_id
-  env_var_rzp_key_secret = var.env_var_rzp_key_secret
+  env_var_jwt_secret_key      = var.env_var_jwt_secret_key
+  env_var_mail_username       = var.env_var_mail_username
+  env_var_mail_password       = var.env_var_mail_password
+  env_var_rzp_key_id          = var.env_var_rzp_key_id
+  env_var_rzp_key_secret      = var.env_var_rzp_key_secret
+  env_var_seed_admin_password = var.env_var_seed_admin_password
+  env_var_seed_user_password  = var.env_var_seed_user_password
 
   tags = local.common_tags
 }

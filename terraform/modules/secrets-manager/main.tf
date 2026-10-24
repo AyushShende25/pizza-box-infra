@@ -18,6 +18,8 @@ resource "aws_secretsmanager_secret_version" "sm_version" {
     MAIL_PASSWORD       = var.env_var_mail_password
     RAZORPAY_KEY_ID     = var.env_var_rzp_key_id
     RAZORPAY_KEY_SECRET = var.env_var_rzp_key_secret
+    SEED_ADMIN_PASSWORD = var.env_var_seed_admin_password
+    SEED_USER_PASSWORD  = var.env_var_seed_user_password
   })
 
   lifecycle {

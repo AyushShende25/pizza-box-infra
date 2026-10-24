@@ -50,7 +50,12 @@ variable "env_var_rzp_key_id" {
 variable "env_var_rzp_key_secret" {
   type = string
 }
-
+variable "env_var_seed_admin_password" {
+  type = string
+}
+variable "env_var_seed_user_password" {
+  type = string
+}
 
 variable "tags" {
   type        = map(string)
