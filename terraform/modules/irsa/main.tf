@@ -1,3 +1,80 @@
+data "aws_iam_policy_document" "autoscaler_trust" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+    principals {
+      type        = "Federated"
+      identifiers = [var.oidc_provider_arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${var.oidc_provider_url}:sub"
+      values   = ["system:serviceaccount:kube-system:cluster-autoscaler"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "${var.oidc_provider_url}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "eks_autoscaler_role" {
+  name               = "eks-autoscaler-role"
+  assume_role_policy = data.aws_iam_policy_document.autoscaler_trust.json
+  tags               = var.tags
+}
+
+data "aws_iam_policy_document" "autoscaler" {
+  statement {
+    sid    = "DescribeAutoScalingResources"
+    effect = "Allow"
+    actions = [
+      "autoscaling:DescribeAutoScalingGroups",
+      "autoscaling:DescribeAutoScalingInstances",
+      "autoscaling:DescribeLaunchConfigurations",
+      "autoscaling:DescribeScalingActivities",
+      "autoscaling:DescribeTags",
+      "ec2:DescribeImages",
+      "ec2:DescribeInstanceTypes",
+      "ec2:DescribeLaunchTemplateVersions",
+      "ec2:GetInstanceTypesFromInstanceRequirements",
+      "eks:DescribeNodegroup",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ManageClusterAutoScalingGroups"
+    effect = "Allow"
+    actions = [
+      "autoscaling:SetDesiredCapacity",
+      "autoscaling:TerminateInstanceInAutoScalingGroup",
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/k8s.io/cluster-autoscaler/enabled"
+      values   = ["true"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/k8s.io/cluster-autoscaler/${var.cluster_name}"
+      values   = ["owned"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "autoscaler_policy" {
+  name        = "ClusterAutoscalerIAMPolicy"
+  description = "Allow Cluster Autoscaler to manage this EKS cluster's node groups"
+  policy      = data.aws_iam_policy_document.autoscaler.json
+}
+resource "aws_iam_role_policy_attachment" "autoscaler_policy" {
+  role       = aws_iam_role.eks_autoscaler_role.name
+  policy_arn = aws_iam_policy.autoscaler_policy.arn
+}
+
 # Trust policy for ESO IRSA
 data "aws_iam_policy_document" "eks_eso_assume_role" {
   statement {

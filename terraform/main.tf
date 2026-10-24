@@ -55,6 +55,7 @@ module "irsa" {
   r53_hosted_zone_id  = data.aws_route53_zone.main.zone_id
   secret_arn          = module.secrets_manager.secret_arn
   s3_media_bucket_arn = module.s3_media.bucket_arn
+  cluster_name        = module.eks.cluster_name
   tags                = local.common_tags
 }
 
@@ -142,12 +143,14 @@ module "secrets_manager" {
 module "helm" {
   source = "./modules/helm"
 
-  cluster_name           = module.eks.cluster_name
-  r53_hosted_zone        = var.r53_hosted_zone
-  external_dns_role_arn  = module.irsa.external_dns_role_arn
-  eso_role_arn           = module.irsa.eso_role_arn
-  lb_controller_role_arn = module.irsa.lb_controller_role_arn
-  vpc_id                 = module.vpc.vpc_id
+  cluster_name                = module.eks.cluster_name
+  r53_hosted_zone             = var.r53_hosted_zone
+  external_dns_role_arn       = module.irsa.external_dns_role_arn
+  eso_role_arn                = module.irsa.eso_role_arn
+  lb_controller_role_arn      = module.irsa.lb_controller_role_arn
+  vpc_id                      = module.vpc.vpc_id
+  aws_region                  = var.aws_region
+  cluster_autoscaler_role_arn = module.irsa.cluster_autoscaler_role_arn
 
   depends_on = [
     module.eks
@@ -303,9 +306,9 @@ module "github_api_ci" {
   github_repository = var.github_api_repo
   allowed_branch    = "main"
 
-  policy_arns = [
-    aws_iam_policy.api_ecr_push.arn
-  ]
+  policy_arns = {
+    ecr_policy_arn = aws_iam_policy.api_ecr_push.arn
+  }
 }
 
 module "github_client_ci" {
@@ -316,9 +319,9 @@ module "github_client_ci" {
   github_repository = var.github_client_repo
   allowed_branch    = "main"
 
-  policy_arns = [
-    aws_iam_policy.client_s3_deploy.arn
-  ]
+  policy_arns = {
+    s3_policy_arn = aws_iam_policy.client_s3_deploy.arn
+  }
 }
 
 module "github_admin_ci" {
@@ -329,7 +332,8 @@ module "github_admin_ci" {
   github_repository = var.github_admin_repo
   allowed_branch    = "main"
 
-  policy_arns = [
-    aws_iam_policy.admin_s3_deploy.arn
-  ]
+  policy_arns = {
+    s3_policy_arn = aws_iam_policy.admin_s3_deploy.arn
+  }
+
 }

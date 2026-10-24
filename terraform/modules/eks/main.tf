@@ -65,7 +65,10 @@ resource "aws_eks_node_group" "eks_ng" {
     max_unavailable = 1
   }
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    "k8s.io/cluster-autoscaler/enabled"                     = "true"
+    "k8s.io/cluster-autoscaler/${aws_eks_cluster.eks.name}" = "owned"
+  })
 }
 
 # OIDC

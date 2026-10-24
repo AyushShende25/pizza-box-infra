@@ -6,6 +6,10 @@ variable "lb_controller_role_arn" {
   type = string
 }
 
+variable "cluster_autoscaler_role_arn" {
+  type = string
+}
+
 
 variable "cluster_name" {
   type = string
@@ -20,5 +24,9 @@ variable "r53_hosted_zone" {
 }
 
 variable "vpc_id" {
+  type = string
+}
+
+variable "aws_region" {
   type = string
 }

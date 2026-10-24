@@ -9,3 +9,6 @@ output "lb_controller_role_arn" {
 output "external_dns_role_arn" {
   value = aws_iam_role.external_dns_role.arn
 }
+output "cluster_autoscaler_role_arn" {
+  value = aws_iam_role.eks_autoscaler_role.arn
+}

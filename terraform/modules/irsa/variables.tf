@@ -24,3 +24,8 @@ variable "s3_media_bucket_arn" {
   type        = string
   description = "ARN of the media-uploads S3 Bucket"
 }
+
+variable "cluster_name" {
+  type        = string
+  description = "EKS cluster name"
+}

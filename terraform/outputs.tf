@@ -17,3 +17,7 @@ output "nat_gateway_ids" {
   description = "Map of public subnet names to NAT Gateway IDs"
   value       = module.vpc.nat_gateway_ids
 }
+
+output "api_ci_role_arn" {
+  value = module.github_api_ci.role_arn
+}
