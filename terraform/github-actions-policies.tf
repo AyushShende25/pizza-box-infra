@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "api_ecr_push" {
       "ecr:BatchGetImage",
     ]
 
-    resources = [var.ecr_arn]
+    resources = [module.app_ecr.repository_arn]
   }
 }
 
@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "client_s3_deploy" {
     ]
 
     resources = [
-      var.client_bucket_arn
+      module.s3_react_client.bucket_arn
     ]
   }
 
@@ -55,8 +55,17 @@ data "aws_iam_policy_document" "client_s3_deploy" {
     ]
 
     resources = [
-      "${var.client_bucket_arn}/*"
+      "${module.s3_react_client.bucket_arn}/*"
     ]
+  }
+
+  statement {
+    sid    = "CreateInvalidation"
+    effect = "Allow"
+    actions = [
+      "cloudfront:CreateInvalidation"
+    ]
+    resources = [module.cloudfront_react_client.arn]
   }
 }
 
@@ -78,9 +87,7 @@ data "aws_iam_policy_document" "admin_s3_deploy" {
       "s3:GetBucketLocation",
     ]
 
-    resources = [
-      var.admin_bucket_arn
-    ]
+    resources = [module.s3_react_admin.bucket_arn]
   }
 
   statement {
@@ -94,8 +101,17 @@ data "aws_iam_policy_document" "admin_s3_deploy" {
     ]
 
     resources = [
-      "${var.admin_bucket_arn}/*"
+      "${module.s3_react_admin.bucket_arn}/*"
     ]
+  }
+
+  statement {
+    sid    = "CreateInvalidation"
+    effect = "Allow"
+    actions = [
+      "cloudfront:CreateInvalidation"
+    ]
+    resources = [module.cloudfront_react_admin.arn]
   }
 }
 
