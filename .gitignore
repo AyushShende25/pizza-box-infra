@@ -43,6 +43,6 @@ terraform.rc
 # Uncomment the line below if you want to ignore planout files.
 # planout
 
-commands.md
+
 .DS_Store
 .env
